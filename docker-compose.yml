@@ -1,0 +1,51 @@
+# Content Studio — local + production orchestration.
+#
+# Services:
+#   backend  — FastAPI + LLM Provider (Groq/OpenAI/Gemini/Ollama)
+#   frontend — Static frontend served by nginx
+#
+# Usage:
+#   docker compose up --build
+#   docker compose down
+
+services:
+  backend:
+    build: ./backend
+    container_name: content-studio-backend
+
+    environment:
+      LLM_PROVIDER: ${LLM_PROVIDER:-groq}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+
+    expose:
+      - "8000"
+
+    restart: unless-stopped
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build: ./frontend
+    container_name: content-studio-frontend
+
+    ports:
+      - "8080:80"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    restart: unless-stopped
