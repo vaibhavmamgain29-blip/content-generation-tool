@@ -613,16 +613,6 @@ content-generation-tool/
 
 ---
 
-# 📷 Screenshots
-
-> Add screenshots here after deployment.
-
-Suggested screenshots:
-
-- Home Page
-- Streaming Content Generation
-- Backend Ready Status
-- API Documentation
 
 ---
 
