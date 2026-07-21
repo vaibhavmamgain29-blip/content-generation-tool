@@ -10,7 +10,7 @@ class GenerateRequest(BaseModel):
     prompt: str = Field(
         ...,
         min_length=1,
-        max_length=8000,
+        max_length=50000,
     )
 
     temperature: float = Field(

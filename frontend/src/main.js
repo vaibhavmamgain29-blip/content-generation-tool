@@ -2,6 +2,9 @@
 // Streams responses from the FastAPI backend using fetch + ReadableStream.
 
 const $ = (sel) => document.querySelector(sel);
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "https://content-generation-tool.onrender.com";
 
 const els = {
   form: $("#gen-form"),
@@ -42,7 +45,7 @@ async function checkHealth() {
   setStatus("unknown", "Checking...");
 
   try {
-    const res = await fetch("/api/health");
+    const res = await fetch(`${API_BASE}/api/health`);
 
     if (!res.ok) throw new Error();
 
@@ -80,7 +83,7 @@ async function streamGenerate(payload) {
 
   const cursor = mountCursor();
 
-  const res = await fetch("/api/generate", {
+  const res = await fetch(`${API_BASE}/api/generate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -215,6 +218,12 @@ els.form.addEventListener("submit", async (e) => {
   const prompt = els.prompt.value.trim();
 
   if (!prompt) return;
+
+  // Client-side validation
+  if (prompt.length > 50000) {
+    showError("Prompt exceeds the maximum allowed length (50,000 characters).");
+    return;
+  }
 
   const payload = {
     prompt,
